@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+
+       <!--上传文件
+       1 传统flash上传
+       2  隐藏iframe框上传
+       3  表单数据提交
+       4  HTML5新工具-FileAPI-->
+
+        <meta charset="UTF-8">
+        <title>上传</title>
+        <style type="text/css">
+            *{
+                margin: 0px;
+                padding: 0px;
+            }
+            .filePicker{
+                width: 160px;
+                height: 44px;
+                line-height: 44px;
+                text-align: center;
+                color: #fff;
+                background: #00b7ee;
+            }
+            .filePicker input[type="file"] {
+                position: relative;
+                top: -44px;
+                left: 0px;
+                width: 160px;
+                height: 44px;
+                opacity: 0;
+                cursor: pointer;
+                overflow: hidden;
+                z-index: 0;
+            }
+
+            .container{
+                width: 160px;
+                margin: 30px auto;
+            }
+        </style>
+    </head>
+    <body>
+      <form action="/testReport/" method="post"  enctype="multipart/form-data">
+         {% csrf_token %}
+        <div class="container">
+            <div class="filePicker">
+                <label>点击选择文件</label>
+                <input id="fileInput" type="file" name="file" multiple="multiple" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+                <input type="submit" value="get">
+            </div>
+        </div>
+      </form>
+
+    </body>
+</html>
