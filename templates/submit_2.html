@@ -1,0 +1,177 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+    	<meta charset="utf-8"></head>
+    	<title>巨幕</title>
+    	<!--bootstrap引入-->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-fileinput-master/css/fileinput.min.css">
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="bootstrap-fileinput-master/js/fileinput.min.js"></script>
+
+    <style type="text/css">
+      .jumbotron {
+      	height: 100%;
+      }
+      .jumb{
+      	background-color: #666;
+      }
+      .line{
+      	width: 20px;
+      	text-align: center;
+      }
+      .i{
+      	width: 100%;
+      }
+      .upload{
+      	width:100%;
+      	height: 500px;
+      	background-image:url(img/excel3.jpg);
+
+       }
+       .form-size{
+       	  width: ;
+       }
+       .but{
+       	  text-align: center;
+       }
+
+
+
+    </style>
+
+    <script type="text/javascript">
+       function oneClick(){
+       	window.location.hash = "#ac";
+       }
+       function twoClick(){
+       	window.location.hash = "#ad";
+       }
+       //定位
+       var xmlHttp;
+        function uploadxls(contextPath){
+         //判断是否选择了文件并且后缀是xls
+    if(check()){
+         //检验文件是否存在
+        xlsfileupload(contextPath);
+      }
+    }
+         //获取上传文件 文件名
+    function getFileName(){
+         //获取文件名
+        var upfile = document.getElementById("uploadxlsfile").value;
+        var allfilename = upfile.split("\\");
+        var filename = allfilename[allfilename.length-1];
+        return filename;
+    }
+    //
+    function xlsfileupload(contextPath){
+
+        document.uploadxlsform.action = contextPath+'/repository2.do?method=uploadXls';
+        document.uploadxlsform.target="_self";
+        document.uploadxlsform.submit();
+        alert("上传完成！");
+        window.close();
+
+    }
+    function submitAfter(req,res){
+        var result = res.getAttr("result");
+          if(null!=result&&""!=result){
+              alert(result);
+          }
+    }
+         //是否选择了文件并且后缀是xls文件判断
+    function check(){
+       var upfile = document.getElementById("uploadxlsfile").value;
+       if(upfile=="" || upfile==null){
+          return false;
+       }
+       if(upfile.endWith("xlsx")){
+         return true;
+       }else{
+         alert("请上传Excel文件！");
+         return false;
+       }
+       return true;
+     }
+  String.prototype.endWith=function(oString){
+    var   reg=new RegExp(oString+"$");
+    return   reg.test(this);
+ }
+
+    </script>
+    </head>
+    <body>
+    <div>
+      <div class="jumb">
+         <div class="i">
+           <img src="img/iimage.jpg">
+           <div class="carousel-caption">
+           <h1>也许下一刻就会大放光彩！</h1>
+           <hr class="line">
+             <p>Any Call Mrseal</p>
+             <p><input class="btn btn-primary btn-lg" type="button" value="这里上传" onclick="javascript:oneClick();"><input class="btn btn-primary btn-lg" type="button" value="这里下载" onclick="javascript:twoClick();">
+             </p>
+           </div>
+         </div>
+      </div>
+      <hr>
+      <div class="upload">
+      <div id="ac">
+        <div id= "adc" cal>
+          <form action="/testReport/" name="uploadxlsform" id="uploadxlsform" method="post" enctype="multipart/form-data" class="bs-example bs-exampe-form" role="form">
+            <div class="input-group">
+              <span class="input-group-addon">小区中文名1</span>
+              <input type="text" class="form-control form-size" placeholder="请在这里输入1小区">
+            </div>
+            <br>
+            <br>
+            <div class="input-group">
+              <span class="input-group-addon">小区中文名2</span>
+              <input type="text" class="form-control form-size" placeholder="请在这里输入2小区">
+            </div>
+            <br>
+            <br>
+            <div class="input-group">
+              <span class="input-group-addon">小区中文名3</span>
+              <input type="text" class="form-control form-size" placeholder="请在这里输入3小区">
+            </div>
+            <br>
+            <br>
+            <br>
+            <div>
+
+                 <label for="name">单验报告模板</label>
+                 <input class="file" type="file" name="uploadxlsfile" id="uploadxlsfile" value="模板" />
+
+                 <label for="name">测试数据1</label>
+                 <input class="file" type="file" name="uploadxlsfile" id="uploadxlsfile" />
+
+                 <label for="name">测试数据2</label>
+                 <input class="file" type="file" name="uploadxlsfile" id="uploadxlsfile" />
+
+                 <label for="name">测试数据3</label>
+                 <input class="file" type="file" name="uploadxlsfile" id="uploadxlsfile" />
+
+
+
+            </div>
+            <br>
+            <div class="but">
+            	<button type="button" value="提 交" name="B1" class="btn btn-default" onclick="uploadxls('<%=request.getContextPath()%>');" />提 交</button>
+            	<button type="reset"  value="重 置" name="B2" class="btn btn-default" />重 置</button>
+            </div>
+          </form>
+          <!--bootstrap美化input属性<input type="file" id="file" class="file">-->
+        </div>
+      </div>
+  </div>
+  <hr>
+      <div id="ad">
+        <div id= "adc"> <label>这里下载</label></div>
+      </div>
+    </div>
+
+    </body>
+    </html>
