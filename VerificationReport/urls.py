@@ -17,9 +17,15 @@ from django.conf.urls import url
 from django.contrib import admin
 from views import testReport
 from views import submit
+from views import submitMongodbMessage
+from views import insertMessageIntoMongodb
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^submit/$', submit),
-    url(r'^testReport/$', testReport)
+    url(r'^testReport/$', testReport),
+    url(r'^submitMongodbMessage', submitMongodbMessage),
+    url(r'^insertMessageIntoMongodb', insertMessageIntoMongodb)
+
 ]

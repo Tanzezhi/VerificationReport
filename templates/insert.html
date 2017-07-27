@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>插入数据</title>
+
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-fileinput-master/css/fileinput.min.css">
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+
+	<style type="text/css">
+      h2{
+        color: #897;
+      }
+      .sub{
+      	text-align: center;
+      }
+      span{
+      	color:#fff;
+      }
+	</style>
+</head>
+
+<body>
+
+   <form action="/insertMessageIntoMongodb/" name="" method="get" enctype="" id="" class="">
+        <div class="" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h2 class=>请输入您的数据</h2>
+                 {% if kong_error %}
+                           <p style="color: red;">小区中文名不能为空</p>
+                     {% endif %}
+                       {% if fail_error %}
+                           <p style="color: red;">该小区中文名已存在</p>
+                     {% endif %}
+                {% if success_error %}
+                           <p style="color: red;">工参插入成功</p>
+                     {% endif %}
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">小区中文名： </span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s1_name" id="s1_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">地市：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s2_name"  id="s2_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">LAC：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s3_name"  id="s3_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">CI：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s4_name"  id="s4_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">CGI：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s5_name"  id="s5_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">站号：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s6_name"  id="s6_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">经度：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s7_name"  id="s7_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">纬度：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s8_name"  id="s8_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">覆盖室内：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s9_name"  id="s9_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">1800载频数：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s10_name"  id="s10_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">900载频数：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s11_name"  id="s11_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">AMR是否开：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s12_name"  id="s12_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">BBC：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s13_name"  id="s13_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">BCCH频点：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s14_name"  id="s14_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">TCH频点：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s15_name"  id="s15_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">TCH总数：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s16_name"  id="s16_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">SDCCH信道：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s17_name"  id="s17_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">GPRS静态信道数：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s18_name"  id="s18_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">GPRS下行功控是否开通：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s19_name"  id="s19_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">IRC是否开通：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s20_name"  id="s20_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">MCCCH是否开通：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s21_name"  id="s21_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">NCC：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s22_name"  id="s22_name">
+                   </div>
+                   <br>
+
+                   <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon3">PDCH静态信道配置数：</span>
+                     <input type="text" class="form-control" aria-describedby="basic-addon3" name ="s23_name"  id="s23_name">
+                   </div>
+                   <br>
+                   <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">开通EDGE载频数：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s24_name"  id="s24_name">
+                    </div>
+
+                  </div>
+
+
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">联合寻呼是否开通：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s25_name"  id="s25_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">配置的GSM邻区个数：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s26_name"  id="s26_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">配置的TD邻区个数：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s27_name"  id="s27_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">设备厂商：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s28_name"  id="28_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">所属BSC：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s29_name"  id="s29_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">所属BTS：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s30_name"  id="s30_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">所属MSC：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s31_name"  id="s31_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">所用频段：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s32_name"  id="s32_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">跳频类型：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s33_name"  id="s33_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">载频数量：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s34_name"  id="s34_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">支持EGPRS：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s35_name"  id="s35_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">CCCH信道数：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s36_name"  id="s36_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">GPRS动态信道数：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s37_name"  id="s37_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">发射功率：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s38_name"  id="s38_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">区县：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s39_name"  id="s39_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">是否在TD覆盖区内：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s40_name"  id="s40_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">所属网格编号：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s41_name"  id="s41_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">天线挂高：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s42_name"  id="s42_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">方位角：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s43_name"  id="s43_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">天线下倾角：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s44_name"  id="s44_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">电调下倾角：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s45_name"  id="s45_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">机械下倾角：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s46_name"  id="s46_name">
+                    </div>
+                    <br>
+
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">区域维护部：</span>
+                      <input type="text" class="form-control"  aria-describedby="basic-addon2" name ="s47_name"  id="s47_name">
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div class="sub">
+
+                  <input type="submit" value="插 入" name="B1" class="btn btn-default"  />
+                 <input type="reset"  value="重 置" name="B2" class="btn btn-default" />
+                </div>
+              </div>
+	        </div>
+	      </div>
+       </div>
+     </form>
+  </body>
+</html>

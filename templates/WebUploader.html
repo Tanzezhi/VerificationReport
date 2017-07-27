@@ -1,0 +1,186 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Excel文件</title>
+        <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/fileinput.min.css">
+	    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	    <script src="/static/js/fileinput.js "></script>
+	    <script src="/static/js/zh.js"></script>
+	    <style type="text/css">
+	       .sub{
+	       	 width:400px;
+
+	       	 margin-left: 250px;
+	       }
+	       span{
+
+	       	font-size: 15px;
+	       }
+           .bts{
+           	 text-align: center;
+           }
+           .left{
+           	  margin-left: 100px;
+           }
+           .right{
+           	  float: right;
+           	  margin-right: 100px;
+           }
+           .input-large{
+           	  width: 360px;
+           }
+           .font{
+           	 font-size: 20px;
+           }
+           .font a:hover{
+           	text-decoration: none;
+           }
+
+	    </style>
+	    <script>
+
+        function uploadxls(contextPath){
+         //判断是否选择了文件并且后缀是xls
+       if(check()){
+         //检验文件是否存在
+        xlsfileupload(contextPath);
+      }
+    }
+         //获取上传文件 文件名
+    function getFileName(){
+         //获取文件名
+        var upfile = document.getElementById("uploadxlsfile").value;
+        var allfilename = upfile.split("\\");
+        var filename = allfilename[allfilename.length-1];
+        return filename;
+    }
+    //
+    function xlsfileupload(contextPath){
+
+        document.uploadxlsform.action = contextPath+'/repository2.do?method=uploadXls';
+        document.uploadxlsform.target="_self";
+        document.uploadxlsform.submit();
+        document.getElementById("text1").value;
+        document.getElementById("text2").value;
+        document.getElementById("text3").value;
+        alert("上传完成！");
+        window.close();
+
+    }
+    function submitAfter(req,res){
+        var result = res.getAttr("result");
+          if(null!=result&&""!=result){
+              alert(result);
+          }
+    }
+         //是否选择了文件并且后缀是xls文件判断
+    function check(){
+       var upfile = document.getElementById("uploadxlsfile").value;
+       for (var i=0;i<upfile.length;i++)
+       {
+       if(upfile[i]=="" || upfile[i]==null){
+          alert("您还有未上传Excel文件！");
+         }
+       }
+       if(upfile.endWith("xlsx")){
+             return true;
+       }else{
+             alert("请上传Excel文件！");
+             return false;
+       }
+
+
+
+       return true;
+     }
+
+
+  String.prototype.endWith=function(oString){
+    var   reg=new RegExp(oString+"$");
+    return   reg.test(this);
+ }
+	    </script>
+    </head>
+    <body>
+      <form  action="/testReport/" name="uploadxlsform" id="uploadxlsform" method="POST" enctype="multipart/form-data" class="">
+        <div class="" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="myModalLabel">请选择Excel文件</h4>
+              </div>
+              <div class="modal-body">
+                <div class="input-group">
+                  <span class="input-group-addon">小区中文名1</span>
+                    {% if s1_name_error %}
+                           <p style="color: red;">输入的小区中文名不存在.</p>
+                    {% endif %}
+                  <input type="text" class="form-control form-size" placeholder="请在这里输入1小区" id="s1_name" name="s1_name">
+                </div>
+                <div class="input-group">
+                  <span class="input-group-addon">小区中文名2</span>
+                    {% if s2_name_error %}
+                           <p style="color: red;">输入的小区中文名不存在.</p>
+                     {% endif %}
+                  <input type="text" class="form-control form-size" placeholder="请在这里输入2小区" id="s2_name" name="s2_name">
+                </div>
+                <div class="input-group">
+                  <span class="input-group-addon">小区中文名3</span>
+                    {% if s3_name_error %}
+                           <p style="color: red;">输入的小区中文名不存在.</p>
+                     {% endif %}
+                  <input type="text" class="form-control form-size" placeholder="请在这里输入3小区" id="s3_name" name="s3_name">
+                </div>
+                <br>
+                <div class="sub">
+                 <span>选择模板文件</span>
+                    {% if template_error %}
+                       <p style="color: red;">请选择单验报告模板.</p>
+                      {% endif %}
+                 <input class="file" type="file"  id="template_file" name="template_file">
+                 <br>
+
+                 <span>选择测试数据1</span>
+                {% if test1_error %}
+                           <p style="color: red;">请选择s1小区测试数据.</p>
+                     {% endif %}
+                 <input class="file" type="file"  id="s1_file" name="s1_file">
+
+
+                 <br>
+
+                 <span>选择测试数据2</span>
+                 <input class="file" type="file"  id="s2_file" name="s2_file">
+                 <br>
+
+                 <span>选择测试数据3</span>
+                 <input class="file" type="file"  id="s3_file" name="s3_file">
+
+
+                 <br>
+
+
+
+
+                </div>
+                <br>
+                <div class="bts">
+                <input type="submit" value="提 交" name="B1" class="btn btn-default" onclick="uploadxls('<%=request.getContextPath()%>');" />
+                </div>
+                <hr>
+
+                <div class="font">
+                <a href="{% static path %}" class="left" >这里导出模板</a>
+                <a class="right" href="/submitMongodbMessage/">这里插入工参</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </body>
+  </html>
