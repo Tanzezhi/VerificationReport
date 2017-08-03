@@ -197,11 +197,18 @@ def get_connected_value_and_unconnected_value(measured_sheet,measured_sheet_nrow
         elif str(measured_sheet.cell(i,5).value) == "Call connected":
             count_Call_connected = count_Call_connected + 1
 
-    connected = 1 - (count_Call_blocked / count_Call_attempt)
-    unconnected = 1 - (count_Call_dropped / count_Call_connected)
+    if count_Call_attempt == 0:
+        connected_value = "100.00%"
+    else:
+        connected = 1 - (count_Call_blocked / count_Call_attempt)
+        connected_value = "%.2f%%" % (connected * 100)
 
-    connected_value = "%.2f%%" % (connected * 100)
-    unconnected_value = "%.2f%%" % (unconnected * 100)
+    if count_Call_connected == 0:
+        unconnected_value = "100.00%"
+    else:
+        unconnected = 1 - (count_Call_dropped / count_Call_connected)
+        unconnected_value = "%.2f%%" % (unconnected * 100)
+
     return connected_value,unconnected_value
 
 
@@ -582,7 +589,7 @@ def writeS3_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,C
     wr.write('Q37',connected_value)  # 填写无线接通率
     wr.write('Q38',unconnected_value)  # 填写无线掉话率
     wr.write('Q39',max_value)  # 填写单用户下行峰值吞吐率（kpbs)
-    wr.write('QK40',value)  # 填写语音RxQuality质量0-4级（%）
+    wr.write('Q40',value)  # 填写语音RxQuality质量0-4级（%）
 
 
 def getMessageFromMongodb(village_name):
