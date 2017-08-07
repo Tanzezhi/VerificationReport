@@ -22,12 +22,17 @@ IF(INT(6371004*ACOS((SIN(RADIANS(H5))*SIN(RADIANS(N5))+COS(RADIANS(H5))*COS(RADI
 """
 
 
-def get_lontitude_latitude(Latitude,Lontitude,measured_sheet,measured_sheet_nrows):
+def get_lontitude_latitude(s_LAC,s_CI,Latitude,Lontitude,measured_sheet,measured_sheet_nrows):
+
     for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,8).value) == '' or str(measured_sheet.cell(i,7).value) == '':
-            continue
+        global measured_latitude_value, measured_lontitude_value
+        if str(measured_sheet.cell(i,8).value) == '' or str(measured_sheet.cell(i,7).value) == '' \
+                or str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC \
+                or str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            measured_latitude_value = 0
+            measured_lontitude_value = 0
+
         else:
-            global measured_lontitude_value,measured_latitude_value
             measured_lontitude_value = measured_sheet.cell(i,8).value  # 经度和
             measured_latitude_value = measured_sheet.cell(i,7).value  # 纬度和
             break
@@ -40,7 +45,7 @@ def get_lontitude_latitude(Latitude,Lontitude,measured_sheet,measured_sheet_nrow
     else:
         lontitude_latitude_conclusion = "不一致"
 
-    return [measured_lontitude_value,measured_latitude_value,lontitude_latitude_conclusion,error_value]
+    return measured_lontitude_value,measured_latitude_value,lontitude_latitude_conclusion,error_value
 
 
 """
@@ -48,43 +53,39 @@ def get_lontitude_latitude(Latitude,Lontitude,measured_sheet,measured_sheet_nrow
 """
 
 
-def get_CGI_LAC(CGT_LAC,CGT_CellID,measured_sheet,measured_sheet_nrows):
-    for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,9).value).split('.')[0] != str(CGT_LAC):
-            success_LAC = False
-        else:
-            success_LAC = True
-            break
-    for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,10).value).split('.')[0] != str(CGT_CellID):
-            success_CellID = False
-        else:
-            success_CellID = True
-            break
-    if success_LAC and success_CellID:
-        CGI_conclusion = "一致"
-    else:
-        CGI_conclusion = "不一致"
-    if success_LAC:
-        LAC_conclusion = "一致"
-    else:
-        LAC_conclusion = "不一致"
-
+def get_CGI_LAC(s_LAC,s_CI,CGT_LAC,CGT_CellID,measured_sheet,measured_sheet_nrows):
     LAC = []  # 所有的LAC字符串
     for i in range(1,measured_sheet.nrows):
-        LAC.append(str(measured_sheet.cell(i,9).value).split('.')[0])
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            LAC.append(str(measured_sheet.cell(i,9).value).split('.')[0])
     LAC_list = Counter(LAC).most_common(1)  # [()]
     LAC_most = (LAC_list[0])[0]  # 得到出现次数最多的LAC值
 
     CellID = []  # 所有的CellID字符串
     for i in range(1,measured_sheet.nrows):
-        CellID.append(str(measured_sheet.cell(i,10).value).split('.')[0])
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            CellID.append(str(measured_sheet.cell(i,10).value).split('.')[0])
     CellID_list = Counter(CellID).most_common(1)
     CellID_most = (CellID_list[0])[0]  # 得到出现次数最多的CellID值
 
     measured_CGI = "460-00-" + LAC_most + '-' \
                    + CellID_most
     measured_LAC = LAC_most
+
+    if LAC_most != CGT_LAC:
+        LAC_conclusion = "不一致"
+    else:
+        LAC_conclusion = "一致"
+    if CellID_most != CGT_CellID or LAC_most != CGT_LAC:
+        CGI_conclusion = "不一致"
+    else:
+        CGI_conclusion = "一致"
 
     return CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC
 
@@ -94,19 +95,21 @@ def get_CGI_LAC(CGT_LAC,CGT_CellID,measured_sheet,measured_sheet_nrows):
 """
 
 
-def get_BCCH(BCCH,measured_sheet,measured_sheet_nrows):
-    for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,11).value).split('.')[0] != str(BCCH).split('.')[0]:
-            BCCH_conclusion = "不一致"
-        else:
-            BCCH_conclusion = "一致"
-            break
-
+def get_BCCH(s_LAC,s_CI,BCCH,measured_sheet,measured_sheet_nrows):
     list = []  # 所有的BCCH字符串
     for i in range(1,measured_sheet.nrows):
-        list.append(str(measured_sheet.cell(i,11).value).split('.')[0])
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            list.append(str(measured_sheet.cell(i,11).value).split('.')[0])
     BCCH_list = Counter(list).most_common(1)
     BCCH_most = (BCCH_list[0])[0]  # 得到出现次数最多的CellID值
+    if BCCH_most != str(BCCH).split('.')[0]:
+        BCCH_conclusion = "不一致"
+    else:
+        BCCH_conclusion = "一致"
+
     return BCCH_conclusion,BCCH_most
 
 
@@ -117,10 +120,14 @@ BSIC = int(design_value.cell(1, 22).value) + int(design_value.cell(1, 13).value)
 """
 
 
-def get_BSIC(BSIC,measured_sheet,measured_sheet_nrows):
+def get_BSIC(s_LAC,s_CI,BSIC,measured_sheet,measured_sheet_nrows):
     list = []  # 所有的BCCH字符串
     for i in range(1,measured_sheet.nrows):
-        list.append(str(measured_sheet.cell(i,12).value).split('.')[0])
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            list.append(str(measured_sheet.cell(i,12).value).split('.')[0])
     BSIC_list = Counter(list).most_common(1)
     BSIC_most = (BSIC_list[0])[0]  # 得到出现次数最多的CellID值
 
@@ -138,10 +145,14 @@ def get_BSIC(BSIC,measured_sheet,measured_sheet_nrows):
 """
 
 
-def get_ID(id,ID,measured_sheet,measured_sheet_nrows):
+def get_ID(s_LAC,s_CI,id,ID,measured_sheet,measured_sheet_nrows):
     list = []  # 所有的CellID字符串
     for i in range(1,measured_sheet.nrows):
-        list.append(str(measured_sheet.cell(i,10).value).split('.')[0])
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            list.append(str(measured_sheet.cell(i,10).value).split('.')[0])
     ID_list = Counter(list).most_common(1)
     ID_most = (ID_list[0])[0]  # 得到出现次数最多的CellID值
     ID_bits = ('%x' % int(ID_most)).zfill(4)
@@ -159,11 +170,12 @@ def get_ID(id,ID,measured_sheet,measured_sheet_nrows):
 """
 
 
-def get_RxLevelSub_value(measured_sheet,measured_sheet_nrows):
+def get_RxLevelSub_value(s_LAC,s_CI,measured_sheet,measured_sheet_nrows):
     RxLevelSub = 0
     count = 0
     for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,15).value) == '':
+        if str(measured_sheet.cell(i,15).value) == '' or str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
             continue
         else:
             count = count + 1
@@ -182,20 +194,24 @@ def get_RxLevelSub_value(measured_sheet,measured_sheet_nrows):
 """
 
 
-def get_connected_value_and_unconnected_value(measured_sheet,measured_sheet_nrows):
+def get_connected_value_and_unconnected_value(s_LAC,s_CI,measured_sheet,measured_sheet_nrows):
     count_Call_blocked = 0
     count_Call_attempt = 0
     count_Call_dropped = 0
     count_Call_connected = 0
     for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,5).value) == "Call blocked":
-            count_Call_blocked = count_Call_blocked + 1
-        elif str(measured_sheet.cell(i,5).value) == "Call attempt":
-            count_Call_attempt = count_Call_attempt + 1
-        elif str(measured_sheet.cell(i,5).value) == "Call dropped":
-            count_Call_dropped = count_Call_dropped + 1
-        elif str(measured_sheet.cell(i,5).value) == "Call connected":
-            count_Call_connected = count_Call_connected + 1
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
+        else:
+            if str(measured_sheet.cell(i,5).value) == "Call blocked":
+                count_Call_blocked = count_Call_blocked + 1
+            elif str(measured_sheet.cell(i,5).value) == "Call attempt":
+                count_Call_attempt = count_Call_attempt + 1
+            elif str(measured_sheet.cell(i,5).value) == "Call dropped":
+                count_Call_dropped = count_Call_dropped + 1
+            elif str(measured_sheet.cell(i,5).value) == "Call connected":
+                count_Call_connected = count_Call_connected + 1
 
     if count_Call_attempt == 0:
         connected_value = "100.00%"
@@ -217,15 +233,19 @@ def get_connected_value_and_unconnected_value(measured_sheet,measured_sheet_nrow
 """
 
 
-def get_max(measured_sheet,measured_sheet_nrows):
+def get_max(s_LAC,s_CI,measured_sheet,measured_sheet_nrows):
     max = 0.00
     for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,17).value) == '':
-            value = 0.00
+        if str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC or \
+                        str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
+            continue
         else:
-            value = float(measured_sheet.cell(i,17).value)
-        if value >= max:
-            max = value
+            if str(measured_sheet.cell(i,17).value) == '':
+                value = 0.00
+            else:
+                value = float(measured_sheet.cell(i,17).value)
+            if value >= max:
+                max = value
 
     return max
 
@@ -235,11 +255,13 @@ def get_max(measured_sheet,measured_sheet_nrows):
 """
 
 
-def var_value(measured_sheet,measured_sheet_nrows):
+def var_value(s_LAC,s_CI,measured_sheet,measured_sheet_nrows):
     count_RxQual = 0
     count_lessfour = 0
     for i in range(1,measured_sheet_nrows):
-        if str(measured_sheet.cell(i,16).value) == '':
+        if str(measured_sheet.cell(i,16).value) == '' \
+                or str(measured_sheet.cell(i,9).value).split('.')[0] != s_LAC \
+                or str(measured_sheet.cell(i,10).value).split('.')[0] != s_CI:
             continue
         else:
             count_RxQual = count_RxQual + 1
@@ -278,8 +300,8 @@ def testReport(request):
 
     if request.FILES.get('template_file'):
 
-        template_file = request.FILES.get('template_file')  # 从客户端获取模板excel
-        template_path = "./static/" + template_file.name  # 模板excel存储路径
+        template_file = request.FILES['template_file']  # 从客户端获取模板excel
+        template_path = "./static/excel/" + template_file.name  # 模板excel存储路径
         template_name = template_file.name
         input_excel_file(template_path,template_file)  # 读取模板excel存放在input_excel_file文件夹下
     else:
@@ -287,68 +309,98 @@ def testReport(request):
 
     # s1小区的读写
     if request.FILES.get('s1_file'):
-        test_1_file = request.FILES.get('s1_file')  # 从客户端获取测试S1的excel
-        test_1_path = "./static/" + test_1_file.name  # 测试excel存储路径
+        test_1_file = request.FILES['s1_file']  # 从客户端获取测试S1的excel
+        test_1_path = "./static/excel/" + test_1_file.name  # 测试excel存储路径
         input_excel_file(test_1_path,test_1_file)  # 读取测试excel存放在input_excel_file文件夹下
 
         s1_name = request.POST['s1_name']  # 从客户端获取小区名用于在模板excel中查询相应小区信息
 
         measured_data = xlrd.open_workbook(test_1_path,"rb")
+        global measured_sheet,measured_sheet_nrows
         measured_sheet = measured_data.sheet_by_index(0)
 
         measured_sheet_nrows = measured_sheet.nrows
         s1 = "460-00-" + s1_name
+
         if excel.find({"CGI": s1}).count() == 0:  # 查询小区是否存在
             return render_to_response("WebUploader.html",{'s1_name_error': True})
 
         else:
+            s_LAC = s1_name.split('-')[0]
+            s_CI = s1_name.split('-')[1]
             Lontitude,Latitude,CGI,BCCH,BSIC,ID,LAC,MSC = getMessageFromMongodb(s1_name)  # 获取所要的设计数据
 
             # 经纬度的实测值和是否一致
             measured_lontitude_value,measured_latitude_value,lontitude_latitude_conclusion,error_value = \
-                get_lontitude_latitude(Latitude,Lontitude,measured_sheet,measured_sheet_nrows)
+                get_lontitude_latitude(s_LAC,s_CI,Latitude,Lontitude,measured_sheet,measured_sheet_nrows)
             print measured_lontitude_value,measured_latitude_value,lontitude_latitude_conclusion,error_value
 
             # CGI和LAC实测值和是否一致
             print CGI
             CGT_LAC = CGI.split('-')[2]
             CGT_CellID = CGI.split('-')[3]
-            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(CGT_LAC,CGT_CellID,
+            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(s_LAC,s_CI,CGT_LAC,CGT_CellID,
                                                                                   measured_sheet,
                                                                                   measured_sheet_nrows)
             print CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC
 
             # BCCH实测值和是否一致
-            BCCH_conclusion,BCCH_most = get_BCCH(BCCH,measured_sheet,measured_sheet_nrows)
+            BCCH_conclusion,BCCH_most = get_BCCH(s_LAC,s_CI,BCCH,measured_sheet,measured_sheet_nrows)
             print BCCH_conclusion,BCCH_most
 
             # BSIC的实测值和是否一致
-            BSIC_conclusion,BSIC_most = get_BSIC(BSIC,measured_sheet,measured_sheet_nrows)
+            BSIC_conclusion,BSIC_most = get_BSIC(s_LAC,s_CI,BSIC,measured_sheet,measured_sheet_nrows)
             print BSIC_conclusion,BSIC_most
 
             # 获取测试点平均电平（dBm)
-            RxLevelSub_value = get_RxLevelSub_value(measured_sheet, measured_sheet_nrows)
+            RxLevelSub_value = get_RxLevelSub_value(s_LAC,s_CI,measured_sheet,measured_sheet_nrows)
             print RxLevelSub_value
 
             # 获取无线接通率（%）和无线掉话率（%）
-            connected_value,unconnected_value = get_connected_value_and_unconnected_value(measured_sheet,
+            connected_value,unconnected_value = get_connected_value_and_unconnected_value(s_LAC,s_CI,measured_sheet,
                                                                                           measured_sheet_nrows)
             print connected_value,unconnected_value
 
             # 单用户下行峰值吞吐率（kpbs)
-            max_value = get_max(measured_sheet,measured_sheet_nrows)
+            max_value = get_max(s_LAC,s_CI,measured_sheet,measured_sheet_nrows)
             print max_value
 
             # 语音RxQuality质量0-4级（%）
-            value = var_value(measured_sheet,measured_sheet_nrows)
+            value = var_value(s_LAC,s_CI,measured_sheet,measured_sheet_nrows)
             print value
 
             # 判断基站ID是否一致
             id = MSC.split('-')[1]
-            measured_ID,ID_conclusion = get_ID(id,ID,measured_sheet,measured_sheet_nrows)
+            measured_ID,ID_conclusion = get_ID(s_LAC,s_CI,id,ID,measured_sheet,measured_sheet_nrows)
             print measured_ID,ID_conclusion
 
-            writeS1_place(template_path,Lontitude,Latitude,measured_lontitude_value,measured_latitude_value,
+            # 语音是否通过
+            if connected_value == '100.00%' and unconnected_value == '0.00' and value >= float(0.95):
+                voice = "通过"
+            else:
+                voice = "不通过"
+
+            # 速率是否通过
+            if max_value >= float(130):
+                velocity = "通过"
+            else:
+                velocity = "不通过"
+
+            # 覆盖是否正常
+            if lontitude_latitude_conclusion == '一致' and CGI_conclusion == '一致' and LAC_conclusion == '一致' \
+                    and BCCH_conclusion == '一致' and BSIC_conclusion == '一致' and ID_conclusion == '一致':
+                coverage = "通过"
+            else:
+                coverage = "不通过"
+
+            # 单站整体是否通过
+            if voice == "通过" and coverage == "通过" and velocity == "通过":
+                test = "通过"
+            else:
+                test = "不通过"
+
+            writeS1_place(voice,velocity,coverage,test,template_path,Lontitude,Latitude,measured_lontitude_value,
+                          measured_latitude_value,
                           lontitude_latitude_conclusion,CGI,BCCH,BSIC,ID,LAC,measured_CGI,BCCH_most,BSIC_most,
                           measured_ID,measured_LAC,CGI_conclusion,BCCH_conclusion,BSIC_conclusion,ID_conclusion,
                           LAC_conclusion,RxLevelSub_value,connected_value,unconnected_value,max_value,value
@@ -358,16 +410,8 @@ def testReport(request):
         return render_to_response("WebUploader.html",{'test1_error': True})
 
     # s2 小区的读写
-    if request.FILES.get('s2_file'):
-
-        test_2_file = request.FILES.get('s2_file')  # 从客户端获取测试S1的excel
-        test_2_path = "./static/" + test_2_file.name  # 测试excel存储路径
-        input_excel_file(test_2_path,test_2_file)  # 读取测试excel存放在input_excel_file文件夹下
-
+    if request.POST['s2_name']:
         s2_name = request.POST['s2_name']  # 从客户端获取小区名用于在模板excel中查询相应小区信息
-
-        measured_data = xlrd.open_workbook(test_2_path,"rb")
-        measured_sheet = measured_data.sheet_by_index(0)
 
         measured_sheet_nrows = measured_sheet.nrows
         s2 = "460-00-" + s2_name
@@ -375,116 +419,164 @@ def testReport(request):
             return render_to_response("WebUploader.html",{'s2_name_error': True})
 
         else:
+            s2_LAC = s2_name.split('-')[0]
+            s2_CI = s2_name.split('-')[1]
             Lontitude,Latitude,CGI,BCCH,BSIC,ID,LAC,MSC = getMessageFromMongodb(s2_name)  # 获取所要的设计数据
 
             # CGI和LAC实测值和是否一致
 
             CGT_LAC = CGI.split('-')[2]
             CGT_CellID = CGI.split('-')[3]
-            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(CGT_LAC,CGT_CellID,
+            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(s2_LAC,s2_CI,CGT_LAC,CGT_CellID,
                                                                                   measured_sheet,
                                                                                   measured_sheet_nrows)
             print CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC
 
             # BCCH实测值和是否一致
-            BCCH_conclusion,BCCH_most = get_BCCH(BCCH,measured_sheet,measured_sheet_nrows)
+            BCCH_conclusion,BCCH_most = get_BCCH(s2_LAC,s2_CI,BCCH,measured_sheet,measured_sheet_nrows)
             print BCCH_conclusion,BCCH_most
 
             # BSIC的实测值和是否一致
-            BSIC_conclusion,BSIC_most = get_BSIC(BSIC,measured_sheet,measured_sheet_nrows)
+            BSIC_conclusion,BSIC_most = get_BSIC(s2_LAC,s2_CI,BSIC,measured_sheet,measured_sheet_nrows)
             print BSIC_conclusion,BSIC_most
 
             # 获取测试点平均电平（dBm)
-            RxLevelSub_value = get_RxLevelSub_value(measured_sheet,measured_sheet_nrows)
+            RxLevelSub_value = get_RxLevelSub_value(s2_LAC,s2_CI,measured_sheet,measured_sheet_nrows)
             print RxLevelSub_value
 
             # 获取无线接通率（%）和无线掉话率（%）
-            connected_value,unconnected_value = get_connected_value_and_unconnected_value(measured_sheet,
+            connected_value,unconnected_value = get_connected_value_and_unconnected_value(s2_LAC,s2_CI,measured_sheet,
                                                                                           measured_sheet_nrows)
             print connected_value,unconnected_value
 
             # 单用户下行峰值吞吐率（kpbs)
-            max_value = get_max(measured_sheet,measured_sheet_nrows)
+            max_value = get_max(s2_LAC,s2_CI,measured_sheet,measured_sheet_nrows)
             print max_value
 
             # 语音RxQuality质量0-4级（%）
-            value = var_value(measured_sheet,measured_sheet_nrows)
+            value = var_value(s2_LAC,s2_CI,measured_sheet,measured_sheet_nrows)
             print value
 
             # 判断基站ID是否一致
             id = MSC.split('-')[1]
-            measured_ID,ID_conclusion = get_ID(id,ID,measured_sheet,measured_sheet_nrows)
+            measured_ID,ID_conclusion = get_ID(s2_LAC,s2_CI,id,ID,measured_sheet,measured_sheet_nrows)
             print measured_ID,ID_conclusion
 
-            writeS2_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,CGI_conclusion,
+            # 语音是否通过
+            if connected_value == '100.00%' and unconnected_value == '0.00' and value >= 0.95:
+                voice = "通过"
+            else:
+                voice = "不通过"
+
+            # 速率是否通过
+            if max_value >= float(130):
+                velocity = "通过"
+            else:
+                velocity = "不通过"
+
+            # 覆盖是否正常
+            if lontitude_latitude_conclusion == '一致' and CGI_conclusion == '一致' and LAC_conclusion == '一致' \
+                    and BCCH_conclusion == '一致' and BSIC_conclusion == '一致' and ID_conclusion == '一致':
+                coverage = "通过"
+            else:
+                coverage = "不通过"
+
+            # 单站整体是否通过
+            if voice == "通过" and coverage == "通过" and velocity == "通过":
+                test = "通过"
+            else:
+                test = "不通过"
+
+            writeS2_place(voice,velocity,coverage,test,template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,
+                          CGI_conclusion,
                           BCCH_conclusion,
                           BSIC_conclusion,RxLevelSub_value,connected_value,unconnected_value,max_value,value)
 
     # s3 小区的读写
-    if request.FILES.get('s3_file'):
-
-        test_3_file = request.FILES.get('s3_file')  # 从客户端获取测试S1的excel
-        test_3_path = "./static/" + test_3_file.name  # 测试excel存储路径
-        input_excel_file(test_3_path,test_3_file)  # 读取测试excel存放在input_excel_file文件夹下
+    if request.POST['s3_name']:
 
         s3_name = request.POST['s3_name']  # 从客户端获取小区名用于在模板excel中查询相应小区信息
-
-        measured_data = xlrd.open_workbook(test_3_path,"rb")
-        measured_sheet = measured_data.sheet_by_index(0)
-
-        measured_sheet_nrows = measured_sheet.nrows
         s3 = "460-00-" + s3_name
 
         if excel.find({"CGI": s3}).count() == 0:  # 查询小区是否存在
             return render_to_response("WebUploader.html",{'s3_name_error': True})
 
         else:
+            s3_LAC = s3_name.split('-')[0]
+            s3_CI = s3_name.split('-')[1]
             Lontitude,Latitude,CGI,BCCH,BSIC,ID,LAC,MSC = getMessageFromMongodb(s3_name)  # 获取所要的设计数据
 
             # CGI和LAC实测值和是否一致
 
             CGT_LAC = CGI.split('-')[2]
             CGT_CellID = CGI.split('-')[3]
-            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(CGT_LAC,CGT_CellID,
+            CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC = get_CGI_LAC(s3_LAC,s3_CI,CGT_LAC,CGT_CellID,
                                                                                   measured_sheet,
                                                                                   measured_sheet_nrows)
             print CGI_conclusion,LAC_conclusion,measured_CGI,measured_LAC
 
             # BCCH实测值和是否一致
-            BCCH_conclusion,BCCH_most = get_BCCH(BCCH,measured_sheet,measured_sheet_nrows)
+            BCCH_conclusion,BCCH_most = get_BCCH(s3_LAC,s3_CI,BCCH,measured_sheet,measured_sheet_nrows)
             print BCCH_conclusion,BCCH_most
 
             # BSIC的实测值和是否一致
             bsic = str(BSIC)
-            BSIC_conclusion,BSIC_most = get_BSIC(bsic,measured_sheet,measured_sheet_nrows)
+            BSIC_conclusion,BSIC_most = get_BSIC(s3_LAC,s3_CI,bsic,measured_sheet,measured_sheet_nrows)
             print BSIC_conclusion,BSIC_most
 
             # 获取测试点平均电平（dBm)
-            RxLevelSub_value = get_RxLevelSub_value(measured_sheet,measured_sheet_nrows)
+            RxLevelSub_value = get_RxLevelSub_value(s3_LAC,s3_CI,measured_sheet,measured_sheet_nrows)
             print RxLevelSub_value
 
             # 获取无线接通率（%）和无线掉话率（%）
-            connected_value,unconnected_value = get_connected_value_and_unconnected_value(measured_sheet,
+            connected_value,unconnected_value = get_connected_value_and_unconnected_value(s3_LAC,s3_CI,measured_sheet,
                                                                                           measured_sheet_nrows)
             print connected_value,unconnected_value
 
             # 单用户下行峰值吞吐率（kpbs)
-            max_value = get_max(measured_sheet,measured_sheet_nrows)
+            max_value = get_max(s3_LAC,s3_CI,measured_sheet,measured_sheet_nrows)
             print max_value
 
             # 语音RxQuality质量0-4级（%）
-            value = var_value(measured_sheet,measured_sheet_nrows)
+            value = var_value(s3_LAC,s3_CI,measured_sheet,measured_sheet_nrows)
             print value
 
             # 判断基站ID是否一致
             id = MSC.split('-')[1]
-            measured_ID,ID_conclusion = get_ID(id,ID,measured_sheet,measured_sheet_nrows)
+            measured_ID,ID_conclusion = get_ID(s3_LAC,s3_CI,id,ID,measured_sheet,measured_sheet_nrows)
             print measured_ID,ID_conclusion
 
-            writeS3_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,CGI_conclusion,
+            # 语音是否通过
+            if connected_value == '100.00%' and unconnected_value == '0.00' and value >= 0.95:
+                voice = "通过"
+            else:
+                voice = "不通过"
+
+            # 速率是否通过
+            if max_value >= float(130):
+                velocity = "通过"
+            else:
+                velocity = "不通过"
+
+            # 覆盖是否正常
+            if lontitude_latitude_conclusion == '一致' and CGI_conclusion == '一致' and LAC_conclusion == '一致' \
+                    and BCCH_conclusion == '一致' and BSIC_conclusion == '一致' and ID_conclusion == '一致':
+                coverage = "通过"
+            else:
+                coverage = "不通过"
+
+            # 单站整体是否通过
+            if voice == "通过" and coverage == "通过" and velocity == "通过":
+                test = "通过"
+            else:
+                test = "不通过"
+
+            writeS3_place(voice,velocity,coverage,test,template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,
+                          CGI_conclusion,
                           BCCH_conclusion,BSIC_conclusion,RxLevelSub_value,connected_value,unconnected_value,
                           max_value,value)
-    out_template_path = template_file.name
+
+    out_template_path = '/excel/' + template_file.name
     return render_to_response("WebUploader.html",{"path": out_template_path})
 
 
@@ -505,7 +597,8 @@ class Write_excel(object):
 
 # 找到s1小区位置填写
 
-def writeS1_place(template_path,Lontitude,Latitude,measured_lontitude_value,measured_latitude_value,
+def writeS1_place(voice,velocity,coverage,test,template_path,Lontitude,Latitude,measured_lontitude_value,
+                  measured_latitude_value,
                   lontitude_latitude_conclusion,CGI,BCCH,BSIC,ID,LAC,measured_CGI,BCCH_most,BSIC_most,
                   measured_ID,measured_LAC,CGI_conclusion,BCCH_conclusion,BSIC_conclusion,ID_conclusion,
                   LAC_conclusion,RxLevelSub_value,connected_value,unconnected_value,max_value,value
@@ -544,10 +637,17 @@ def writeS1_place(template_path,Lontitude,Latitude,measured_lontitude_value,meas
     wr.write('E39',max_value)  # 填写单用户下行峰值吞吐率（kpbs)
     wr.write('E40',value)  # 填写语音RxQuality质量0-4级（%）
 
+    # 填写是否通过
+    wr.write('M8',voice)
+    wr.write('M9',velocity)
+    wr.write('M10',coverage)
+    wr.write('E8',test)
+
 
 # 找到s2小区填写
 
-def writeS2_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,CGI_conclusion,BCCH_conclusion,
+def writeS2_place(voice,velocity,coverage,test,template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,
+                  CGI_conclusion,BCCH_conclusion,
                   BSIC_conclusion,RxLevelSub_value,connected_value,unconnected_value,max_value,value):
     wr = Write_excel(filename=template_path)
     wr.write('F22',CGI)  # 填写CGI设计值
@@ -568,9 +668,16 @@ def writeS2_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,C
     wr.write('K39',max_value)  # 填写单用户下行峰值吞吐率（kpbs)
     wr.write('K40',value)  # 填写语音RxQuality质量0-4级（%）
 
+    # 填写是否通过
+    wr.write('M8',voice)
+    wr.write('M9',velocity)
+    wr.write('M10',coverage)
+    wr.write('E8',test)
+
 
 # 找到s3小区位置填写
-def writeS3_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,CGI_conclusion,BCCH_conclusion,
+def writeS3_place(voice,velocity,coverage,test,template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,
+                  CGI_conclusion,BCCH_conclusion,
                   BSIC_conclusion,RxLevelSub_value,connected_value,unconnected_value,max_value,value):
     wr = Write_excel(filename=template_path)
     wr.write('G22',CGI)  # 填写CGI设计值
@@ -590,6 +697,12 @@ def writeS3_place(template_path,CGI,BCCH,BSIC,measured_CGI,BCCH_most,BSIC_most,C
     wr.write('Q38',unconnected_value)  # 填写无线掉话率
     wr.write('Q39',max_value)  # 填写单用户下行峰值吞吐率（kpbs)
     wr.write('Q40',value)  # 填写语音RxQuality质量0-4级（%）
+
+    # 填写是否通过
+    wr.write('M8',voice)
+    wr.write('M9',velocity)
+    wr.write('M10',coverage)
+    wr.write('E8',test)
 
 
 def getMessageFromMongodb(village_name):
@@ -675,7 +788,7 @@ def insertMessageIntoMongodb(request):
         '机械下倾角': s46,'区域维护部': s47
     }
     count = excel.find({'小区中文名': s1}).count()
-    if s1 == "":
+    if s1 == "" or s5 == "":
         return render_to_response('insert.html',{'kong_error': True})
     if count != 0:
         return render_to_response('insert.html',{'fail_error': True})

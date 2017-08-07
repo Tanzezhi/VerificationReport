@@ -105,7 +105,7 @@
 	    </script>
     </head>
     <body>
-      <form  action="/testReport/" name="uploadxlsform" id="uploadxlsform" method="POST" enctype="multipart/form-data" class="">
+      <form  action="/testReport/" name="uploadxlsform" id="uploadxlsform" method="POST" enctype="multipart/form-data">
         <div class="" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
           <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -144,21 +144,16 @@
                  <input class="file" type="file"  id="template_file" name="template_file">
                  <br>
 
-                 <span>选择测试数据1</span>
+                 <span>选择测试数据</span>
                 {% if test1_error %}
-                           <p style="color: red;">请选择s1小区测试数据.</p>
+                           <p style="color: red;">请选择小区测试数据.</p>
                      {% endif %}
                  <input class="file" type="file"  id="s1_file" name="s1_file">
 
 
                  <br>
 
-                 <span>选择测试数据2</span>
-                 <input class="file" type="file"  id="s2_file" name="s2_file">
-                 <br>
 
-                 <span>选择测试数据3</span>
-                 <input class="file" type="file"  id="s3_file" name="s3_file">
 
 
                  <br>
